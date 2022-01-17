@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\BookingsRepository;
+use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: BookingsRepository::class)]
@@ -78,5 +79,10 @@ class Bookings
         $this->endDate = $endDate;
 
         return $this;
+    }
+
+    function canBookTime(DateTime $startTime, DateTime $endTime): bool {
+
+        return true;
     }
 }

@@ -95,4 +95,5 @@ class Room
 
         return ($this->getOnlyForPremiumMembers() && $user->getPremiumMember()) || !$this->getOnlyForPremiumMembers();
     }
+
 }
