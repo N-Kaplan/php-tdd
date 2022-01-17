@@ -25,14 +25,16 @@ class User
     private $credit = 100; //set default value
 
     #[ORM\Column(type: 'boolean')]
-    private $premiumMember = false;
+    private bool $premiumMember = false;
 
     #[ORM\OneToMany(mappedBy: 'userId', targetEntity: Bookings::class)]
     private $bookings;
 
-    public function __construct()
+    public function __construct( bool $premium)
     {
         $this->bookings = new ArrayCollection();
+        $this->premiumMember = $premium;
+
     } //set default value
 
     public function getId(): ?int
@@ -89,7 +91,7 @@ class User
     }
 
     /**
-     * @return Collection|Bookings[]
+     * @return Collection|Booking[]
      */
     public function getBookings(): Collection
     {

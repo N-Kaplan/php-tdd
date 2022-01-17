@@ -109,6 +109,7 @@ class CheckRoomAvailabilityTest extends TestCase
      * function has to start with Test
      */
     public function testPremiumRoom(): void
+     {
         $room = new Room(false);
         $user = new User(false);
 

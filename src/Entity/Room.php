@@ -16,17 +16,18 @@ class Room
     private $id;
 
     #[ORM\Column(type: 'string', length: 255)]
-    private $name;
+    private ?string $name;
 
     #[ORM\Column(type: 'boolean')]
-    private $onlyForPremiumMembers = false;
+    private bool $onlyForPremiumMembers;
 
     #[ORM\OneToMany(mappedBy: 'roomID', targetEntity: Bookings::class)]
-    private $bookings;
+    private ArrayCollection $bookings;
 
-    public function __construct()
+    public function __construct( bool $premium)
     {
         $this->bookings = new ArrayCollection();
+        $this->onlyForPremiumMembers = $premium;
     }
 
     public function getId(): ?int
@@ -66,25 +67,32 @@ class Room
         return $this->bookings;
     }
 
-    public function addBooking(Bookings $booking): self
+    public function addBookings(Bookings $bookings): self
     {
-        if (!$this->bookings->contains($booking)) {
-            $this->bookings[] = $booking;
-            $booking->setRoomId($this);
+        if (!$this->bookings->contains($bookings)) {
+            $this->bookings[] = $bookings;
+            $bookings->setRoomId($this);
         }
 
         return $this;
     }
 
-    public function removeBooking(Booking $booking): self
+    public function removeBookings(Bookings $bookings): self
     {
-        if ($this->bookings->removeElement($booking)) {
+        if ($this->bookings->removeElement($bookings)) {
             // set the owning side to null (unless already changed)
-            if ($booking->getRoomId() === $this) {
-                $booking->setRoomId(null);
+            if ($bookings->getRoomId() === $this) {
+                $bookings->setRoomId(null);
             }
         }
 
         return $this;
+    }
+
+    //initial version of the function, to pass the test:
+    // return true;
+    function canBook(User $user): bool {
+
+        return ($this->getOnlyForPremiumMembers() && $user->getPremiumMember()) || !$this->getOnlyForPremiumMembers();
     }
 }
