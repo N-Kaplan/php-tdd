@@ -63,6 +63,8 @@ Create the following entities
     - username OR email field (you can choose)
     - credit (integer, start credit 100)
     - premiumMember (bool, default false)
+
+    - Note: view database created by doctrine via XAMPP controller: (MySQL, click on Admin)
 - Room
     - name
     - onlyForPremiumMembers (bool, default false)
