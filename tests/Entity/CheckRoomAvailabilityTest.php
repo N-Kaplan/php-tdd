@@ -48,4 +48,6 @@ class CheckRoomAvailabilityTest extends TestCase
 
         $this->assertEquals($expectedOutput, $room->canBook($user));
     }
+
+
 }
