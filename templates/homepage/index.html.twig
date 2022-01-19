@@ -12,7 +12,7 @@
     <h1>Chatrooms</h1>
     <ul>
         {% for room in rooms %}
-        <li> {{ room.id }}. {{ room.name }} <a href="/booking?id={{room.id}}">Reserve</a></li>
+        <li> {{ room.id }}. {{ room.name }} {{ room.onlyForPremiumMembers ? "PREMIUM" : "regular" }} <a href="/booking?id={{room.id}}">Reserve</a></li>
         {% endfor %}
     </ul>
 {#    <h1>Hello {{ controller_name }}! ✅</h1>#}
