@@ -3,9 +3,11 @@
 namespace App\Entity;
 
 use App\Repository\RoomRepository;
+use Cassandra\Date;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use DateTime;
 
 #[ORM\Entity(repositoryClass: RoomRepository::class)]
 class Room
@@ -94,6 +96,20 @@ class Room
     function canBook(User $user): bool {
 
         return ($this->getOnlyForPremiumMembers() && $user->getPremiumMember()) || !$this->getOnlyForPremiumMembers();
+    }
+
+    public function isFree(DateTime $start, DateTime $end, array $reservations): bool
+    {
+        // $bookings = $this->getBookings();
+        $free = true;
+        foreach ($reservations as &$value) {
+            if ($start <= $value['startTime'] && $end >= $value['startTime']) {
+                $free = false;
+            } elseif ($start > $value['startTime'] && $start < $value['endTime']) {
+                $free = false;
+            }
+        }
+        return $free;
     }
 
 }

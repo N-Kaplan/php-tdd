@@ -24,7 +24,7 @@ class CheckTimeLimitTest extends TestCase
      */
     public function testTimeFrame(DateTime $start, DateTime $end, bool $expectedOutput): void
     {
-        $booking = new Bookings($start, $end);
+        $booking = new Bookings();
         $startTime = $start;
         $endTime = $end;
 
