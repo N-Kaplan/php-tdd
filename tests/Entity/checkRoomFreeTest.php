@@ -63,7 +63,6 @@ class checkRoomFreeTest extends TestCase
                     ['startTime' =>new DateTime("2022-01-17 17:00:00"), 'endTime' => new DateTime("2022-01-17 19:00:00")],
                 ],
                 true, false],
-
         ];
     }
 

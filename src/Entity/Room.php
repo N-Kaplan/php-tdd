@@ -24,11 +24,11 @@ class Room
     private bool $onlyForPremiumMembers;
 
     #[ORM\OneToMany(mappedBy: 'roomID', targetEntity: Bookings::class)]
-    private ArrayCollection $bookings;
+    private Collection $bookings;
 
     public function __construct( bool $premium)
     {
-        $this->bookings = new ArrayCollection();
+        $this->bookings = new Collection();
         $this->onlyForPremiumMembers = $premium;
     }
 
