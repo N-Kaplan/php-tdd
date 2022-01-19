@@ -2,7 +2,7 @@
 
 use App\Entity\Bookings;
 use PHPUnit\Framework\TestCase;
-use App\Entity\Room;
+
 
 class CheckTimeLimitTest extends TestCase
 {

@@ -119,4 +119,11 @@ class User
 
         return $this;
     }
+
+    public function canPay(int $hours): bool
+    {
+        $hourPrice = 2;
+        return ($this->getCredit() >= $hours * $hourPrice);
+
+    }
 }
