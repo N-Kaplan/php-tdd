@@ -126,4 +126,8 @@ class User
         return ($this->getCredit() >= $hours * $hourPrice);
 
     }
+    //necessary for form
+    public function __toString(){
+        return strval($this->getUsername());
+    }
 }

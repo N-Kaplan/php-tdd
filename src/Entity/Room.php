@@ -111,4 +111,8 @@ class Room
         return $free;
     }
 
+    //necessary for form
+    public function __toString(){
+        return strval($this->getId());
+    }
 }

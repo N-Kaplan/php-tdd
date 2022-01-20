@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -34,16 +35,20 @@ class BookingController extends AbstractController
         $users = $doctrine->getRepository(User::class)->findAll();
         $choices = [];
         foreach ($users as $user) {
-            $choices[$user->getUsername()] =  $user->getId();
+            $choices[$user->getUsername()] = $user;
         };
 //        var_dump($choices);
         $roomId = $request->query->get('id');
+        $room = $doctrine->getRepository(Room::class)->find($roomId);
         $form = $this->createForm(BookingType::class)
-            ->add('roomId', TextType::class, ['data' => $roomId])
-            ->add('userId', ChoiceType::class, [
-            'choices' => $choices
+            ->add('roomId', EntityType::class, ['data' => $room, 'class' => Room::class])
+            ->add('userId', EntityType::class, [
+                'class' => User::class,
+//                'choice_label' => 'displayName',
+                'choices' => $users,
              ])
             ->add('submit', SubmitType::class);
+//        var_dump($room);
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -59,7 +64,6 @@ class BookingController extends AbstractController
         }
 
         return $this->renderForm('booking/index.html.twig', [
-            'roomId' => $roomId,
             'form' => $form,
         ]);
     }
@@ -68,9 +72,18 @@ class BookingController extends AbstractController
     public function success(ManagerRegistry $doctrine, Request $request): Response
     {
         $session = $this->requestStack->getSession();
+//        var_dump($session);
+
 
 //        $user = $doctrine->getManager()->getRepository(User::class)->find($request['userId']);
 //        $room = $doctrine->getManager()->getRepository(Room::class)->find($request['roomId']);
+
+        return $this->render('booking/success.html.twig', [
+//            'date' => $request['date'],
+//            'startTime' => $request['start-time'],
+//            'endTime' => $request['end-time'],
+//            'roomName' => $room->getName(),
+        ]);
 
     }
 }

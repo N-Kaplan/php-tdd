@@ -33,24 +33,24 @@ class Bookings
         return $this->id;
     }
 
-    public function getRoomID(): string
+    public function getRoomID(): ?Room
     {
         return $this->roomID;
     }
 
-    public function setRoomID(string $roomID): self
+    public function setRoomID(?Room $roomID): self
     {
         $this->roomID = $roomID;
 
         return $this;
     }
 
-    public function getUserId(): int
+    public function getUserId(): ?User
     {
         return $this->userId;
     }
 
-    public function setUserId(int $userId): self
+    public function setUserId(?User $userId): self
     {
         $this->userId = $userId;
 
