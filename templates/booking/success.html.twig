@@ -9,7 +9,11 @@
     </style>
 
     <div class="example-wrapper">
-        <h1>Hello! ✅</h1>
+        <h1>Hello {{ username }}, your room is booked!</h1>
+        <h3>Booking details:</h3>
+        <p>Room: {{ roomName }}</p>
+        <p>Booked from: {{ startTime|format_datetime() }}</p>
+        <p>to: {{ endTime|format_datetime() }}</p>
 
     </div>
 {% endblock %}

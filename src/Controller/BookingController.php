@@ -29,6 +29,7 @@ class BookingController extends AbstractController
     {
         $this->requestStack = $requestStack;
     }
+
     #[Route('/booking', name: 'booking')]
     public function index(ManagerRegistry $doctrine, Request $request, SessionInterface $session): Response
     {
@@ -37,18 +38,16 @@ class BookingController extends AbstractController
         foreach ($users as $user) {
             $choices[$user->getUsername()] = $user;
         };
-//        var_dump($choices);
+
         $roomId = $request->query->get('id');
         $room = $doctrine->getRepository(Room::class)->find($roomId);
         $form = $this->createForm(BookingType::class)
             ->add('roomId', EntityType::class, ['data' => $room, 'class' => Room::class])
             ->add('userId', EntityType::class, [
                 'class' => User::class,
-//                'choice_label' => 'displayName',
                 'choices' => $users,
-             ])
+            ])
             ->add('submit', SubmitType::class);
-//        var_dump($room);
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -56,7 +55,7 @@ class BookingController extends AbstractController
             $booking = $form->getData();
             $session->set('startTime', $booking->getStartDate());
             $session->set('endTime', $booking->getEndDate());
-            $session->set('roomID', $booking->getRoomId());
+            $session->set('roomId', $booking->getRoomId());
             $session->set('userId', $booking->getUserId());
 
             //TODO: view for this route?
@@ -69,20 +68,15 @@ class BookingController extends AbstractController
     }
 
     #[Route('/success', name: 'success')]
-    public function success(ManagerRegistry $doctrine, Request $request): Response
+    public function success(ManagerRegistry $doctrine, RequestStack $requestStack): Response
     {
         $session = $this->requestStack->getSession();
-//        var_dump($session);
-
-
-//        $user = $doctrine->getManager()->getRepository(User::class)->find($request['userId']);
-//        $room = $doctrine->getManager()->getRepository(Room::class)->find($request['roomId']);
 
         return $this->render('booking/success.html.twig', [
-//            'date' => $request['date'],
-//            'startTime' => $request['start-time'],
-//            'endTime' => $request['end-time'],
-//            'roomName' => $room->getName(),
+            'username' => $session->get('userId')->getUsername(),
+            'startTime' => $session->get('startTime'),
+            'endTime' => $session->get('endTime'),
+            'roomName' => $session->get('roomId')->getName(),
         ]);
 
     }
