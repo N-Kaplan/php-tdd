@@ -3,6 +3,9 @@
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -28,24 +31,30 @@ class BookingController extends AbstractController
     #[Route('/booking', name: 'booking')]
     public function index(ManagerRegistry $doctrine, Request $request, SessionInterface $session): Response
     {
-        $users = $doctrine->getRepository(User::class);
+        $users = $doctrine->getRepository(User::class)->findAll();
+        $choices = [];
+        foreach ($users as $user) {
+            $choices[$user->getUsername()] =  $user->getId();
+        };
+//        var_dump($choices);
         $roomId = $request->query->get('id');
-        $form = $this->createForm(BookingType::class);
-
+        $form = $this->createForm(BookingType::class)
+            ->add('roomId', TextType::class, ['data' => $roomId])
+            ->add('userId', ChoiceType::class, [
+            'choices' => $choices
+             ])
+            ->add('submit', SubmitType::class);
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            // $form->getData() holds the submitted values
-            // but, the original `$task` variable has also been updated
+            // $form->getData() holds the submitted values but, the original `$booking` variable has also been updated
             $booking = $form->getData();
             $session->set('startTime', $booking->getStartDate());
             $session->set('endTime', $booking->getEndDate());
-            $session->set('roomID', $roomId);
-            //TODO: userID?
-            $session->set('userId', 1);
+            $session->set('roomID', $booking->getRoomId());
+            $session->set('userId', $booking->getUserId());
 
-            // ... perform some action, such as saving the task to the database
-            //TODO: view for this route.
+            //TODO: view for this route?
             return $this->redirectToRoute('success');
         }
 

@@ -3,19 +3,23 @@
 namespace App\Form;
 
 use App\Entity\Bookings;
+use App\Entity\Room;
+use App\Entity\User;
+
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 
 class BookingType extends AbstractType
 {
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('startDate')
-            ->add('endDate')
-            ->add('roomID')
-            ->add('userId')
+            ->add('startDate', DateTimeType::class)
+            ->add('endDate', DateTimeType::class)
         ;
     }
 
