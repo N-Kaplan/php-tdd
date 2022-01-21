@@ -4,9 +4,7 @@ namespace App\Controller;
 
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -34,11 +32,6 @@ class BookingController extends AbstractController
     public function index(ManagerRegistry $doctrine, Request $request, SessionInterface $session): Response
     {
         $users = $doctrine->getRepository(User::class)->findAll();
-        $choices = [];
-        foreach ($users as $user) {
-            $choices[$user->getUsername()] = $user;
-        };
-
         $roomId = $request->query->get('id');
         $room = $doctrine->getRepository(Room::class)->find($roomId);
         $form = $this->createForm(BookingType::class)
@@ -58,7 +51,6 @@ class BookingController extends AbstractController
             $session->set('roomId', $booking->getRoomId());
             $session->set('userId', $booking->getUserId());
 
-            //TODO: view for this route?
             return $this->redirectToRoute('success');
         }
 
@@ -72,12 +64,57 @@ class BookingController extends AbstractController
     {
         $session = $this->requestStack->getSession();
 
-        return $this->render('booking/success.html.twig', [
-            'username' => $session->get('userId')->getUsername(),
-            'startTime' => $session->get('startTime'),
-            'endTime' => $session->get('endTime'),
-            'roomName' => $session->get('roomId')->getName(),
-        ]);
+        //properties
+        $user = $session->get('userId');
+        $room = $session->get('roomId');
+        $startTime = $session->get('startTime');
+        $endTime = $session->get('endTime');
 
+        //implementing restrictions set by tests
+        //premium room can only be booked by premium user
+        $canBook = $room->canBook($user);
+
+        //a room can only be booked when free
+        $reservations = $room->getReservations($doctrine);
+        //TODO: figure out where DateTime is confused with array
+      //  $isFree = $room->isFree($startTime, $endTime, $reservations);
+
+        //rooms can be booked up to 4 hours
+        $canBookTime = $room->canBookTime($startTime, $endTime);
+
+        //check if a user has enough credit
+        $secondsBooked = ($endTime)->getTimestamp() - ($startTime)->getTimestamp();
+        $hoursBooked = $secondsBooked % 3600 ? intdiv($secondsBooked, 3600) + 1 : intdiv($secondsBooked, 3600);
+        $canPay = $user->canPay($hoursBooked);
+
+        // Book a room
+        if ($canBook && $canBookTime && $canPay) {
+            $booking = new Bookings();
+            $booking->setUserId($user);
+            $booking->setRoomId($room);
+            $booking->setStartDate($startTime);
+            $booking->setEndDate($endTime);
+
+//          see https://symfony.com/doc/current/doctrine.html#relationships-and-associations
+            $entityManager = $doctrine->getManager();
+            // tell Doctrine you want to (eventually) save the booking, user, room (no queries yet)
+            $entityManager->persist($booking);
+            $entityManager->persist($user);
+            $entityManager->persist($room);
+            // actually executes the queries (i.e. the INSERT query)
+            $entityManager->flush();
+
+            //display booking
+            return $this->render('booking/success.html.twig', [
+                'username' => $session->get('userId')->getUsername(),
+                'startTime' => $session->get('startTime'),
+                'endTime' => $session->get('endTime'),
+                'roomName' => $session->get('roomId')->getName(),
+            ]);
+        }
+        //if booking is invalid
+        //todo: add error messages!
+        return $this->redirectToRoute("booking", [
+            'id' => $session->get('roomId')->getId()]);
     }
 }

@@ -80,10 +80,5 @@ class Bookings
 
         return $this;
     }
-//    TODO: 4 is a magical number, refactor!
-    function canBookTime(DateTime $startDate, DateTime $endDate): bool {
 
-        $timeDifference = $startDate->diff($endDate)->h;
-        return $timeDifference <= 4 && $startDate < $endDate;
-    }
 }

@@ -1,6 +1,6 @@
 <?php
 
-use App\Entity\Bookings;
+use App\Entity\Room;
 use PHPUnit\Framework\TestCase;
 
 
@@ -24,10 +24,10 @@ class CheckTimeLimitTest extends TestCase
      */
     public function testTimeFrame(DateTime $start, DateTime $end, bool $expectedOutput): void
     {
-        $booking = new Bookings();
+        $room = new Room(false);
         $startTime = $start;
         $endTime = $end;
 
-        $this->assertEquals($expectedOutput, $booking->canBookTime($startTime, $endTime));
+        $this->assertEquals($expectedOutput, $room->canBookTime($startTime, $endTime));
     }
 }

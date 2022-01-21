@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use DateTime;
+use Doctrine\Persistence\ManagerRegistry;
 
 #[ORM\Entity(repositoryClass: RoomRepository::class)]
 class Room
@@ -27,7 +28,7 @@ class Room
 
     public function __construct( bool $premium)
     {
-        $this->bookings = new Collection();
+        $this->bookings = new ArrayCollection();
         $this->onlyForPremiumMembers = $premium;
     }
 
@@ -95,6 +96,28 @@ class Room
     function canBook(User $user): bool {
 
         return ($this->getOnlyForPremiumMembers() && $user->getPremiumMember()) || !$this->getOnlyForPremiumMembers();
+    }
+
+    //    TODO: 4 is a magical number, refactor!
+    function canBookTime(DateTime $startDate, DateTime $endDate): bool {
+
+//        $timeDifference = $startDate->diff($endDate)->h; only returns the difference in hours, ignores days, minutes, etc.
+//        total time difference in minutes
+        $timeDifferenceMinutes = (($endDate)->getTimestamp() - ($startDate)->getTimestamp()) / 60;
+        return $timeDifferenceMinutes <= 4*60 && $startDate < $endDate;
+    }
+
+    //get reservations from database
+    public function getReservations(ManagerRegistry $doctrine): array
+    {
+        $room = $doctrine->getManager()->getRepository(Room::class)->find($this->getId());
+        $bookings = $room->getBookings();
+        $reservations = [];
+        foreach ($bookings as &$value) {
+            $reservations[] = ['startTime' => $value->getStartDate(), 'endTime' => $value->getEndDate()];
+        }
+        //array within array?
+        return $reservations[0];
     }
 
     public function isFree(DateTime $start, DateTime $end, array $reservations): bool
