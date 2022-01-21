@@ -58,34 +58,34 @@ Now run `bin/phpunit`, this will run all valid tests in your tests directory.
 
 ## Must-have features
 Create the following entities
-- User
+ - [x] User
     - password, email (if working with the login)
     - username OR email field (you can choose)
     - credit (integer, start credit 100)
     - premiumMember (bool, default false)
 
     - Note: view database created by doctrine via XAMPP controller: (MySQL, click on Admin)
-- Room
-    - name
-    - onlyForPremiumMembers (bool, default false)
-- Bookings
-    - Relation to room & User
-    - Start date (datetime)
-    - End date (datetime)
+ - [x] Room
+     - name
+     - onlyForPremiumMembers (bool, default false)
+ - [x] Bookings
+     - Relation to room & User
+     - Start date (datetime)
+     - End date (datetime)
 
 ### General flow
-For now just create rooms directly in the db, you do not need to provide an interface for this.
+- [x]  For now just create rooms directly in the db, you do not need to provide an interface for this.
 
-On the homepage the user gets to see all the rooms, with a link to book a room.
+- [x] On the homepage the user gets to see all the rooms, with a link to book a room.
 He then selects a start and end date and time between which he wants access to the room.
 He is then charged 2 EUR for each hour he booked the room.
 
 The following conditions apply:
 
-- Rooms marked as premium can only be hired for premium members
-- No room can be booked for more than 4 hours
-- Check if they can afford the rent for the room
-- Room can only be booked if no other User has already booked it in this time (this is the most difficult condition)
+-[x]  Rooms marked as premium can only be hired for premium members
+-[x]  No room can be booked for more than 4 hours
+-[x]  Check if they can afford the rent for the room
+-[x]  Room can only be booked if no other User has already booked it in this time (this is the most difficult condition)
 
 ***For all these conditions try to use Test Driven Development first.***
 
