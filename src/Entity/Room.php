@@ -23,7 +23,7 @@ class Room
     #[ORM\Column(type: 'boolean')]
     private bool $onlyForPremiumMembers;
 
-    #[ORM\OneToMany(mappedBy: 'roomID', targetEntity: Bookings::class)]
+    #[ORM\OneToMany(mappedBy: 'roomId', targetEntity: Bookings::class)]
     private Collection $bookings;
 
     public function __construct( bool $premium)
@@ -90,6 +90,8 @@ class Room
 
         return $this;
     }
+
+    //business logic
 
     //initial version of the function, to pass the test:
     // return true;

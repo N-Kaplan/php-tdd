@@ -65,8 +65,10 @@ class BookingController extends AbstractController
         $session = $this->requestStack->getSession();
 
         //properties
-        $user = $session->get('userId');
-        $room = $session->get('roomId');
+        $userId = $session->get('userId')->getId();
+        $user = $doctrine->getManager()->find(User::class, $userId);
+        $roomId = $session->get('roomId')->getId();
+        $room = $doctrine->getManager()->find(Room::class, $roomId);
         $startTime = $session->get('startTime');
         $endTime = $session->get('endTime');
 
@@ -97,10 +99,11 @@ class BookingController extends AbstractController
 
 //          see https://symfony.com/doc/current/doctrine.html#relationships-and-associations
             $entityManager = $doctrine->getManager();
-            // tell Doctrine you want to (eventually) save the booking, user, room (no queries yet)
+            // tell Doctrine you want to (eventually) save the booking, user (no queries yet)
             $entityManager->persist($booking);
             $entityManager->persist($user);
             $entityManager->persist($room);
+
             // actually executes the queries (i.e. the INSERT query)
             $entityManager->flush();
 

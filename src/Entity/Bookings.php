@@ -14,9 +14,9 @@ class Bookings
     #[ORM\Column(type: 'integer')]
     private $id;
 
-    #[ORM\ManyToOne(targetEntity: Room::class, inversedBy: 'userId')]
+    #[ORM\ManyToOne(targetEntity: Room::class, cascade: ["persist"], inversedBy: 'bookings')]
     #[ORM\JoinColumn(nullable: false)]
-    private $roomID;
+    private $roomId;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'bookings')]
     #[ORM\JoinColumn(nullable: false)]
@@ -33,14 +33,14 @@ class Bookings
         return $this->id;
     }
 
-    public function getRoomID(): ?Room
+    public function getroomId(): ?Room
     {
-        return $this->roomID;
+        return $this->roomId;
     }
 
-    public function setRoomID(?Room $roomID): self
+    public function setroomId(?Room $roomId): self
     {
-        $this->roomID = $roomID;
+        $this->roomId = $roomId;
 
         return $this;
     }
@@ -80,5 +80,10 @@ class Bookings
 
         return $this;
     }
+//    TODO: 4 is a magical number, refactor!
+    function canBookTime(DateTime $startDate, DateTime $endDate): bool {
 
+        $timeDifference = $startDate->diff($endDate)->h;
+        return $timeDifference <= 4 && $startDate < $endDate;
+    }
 }

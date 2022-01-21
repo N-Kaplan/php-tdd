@@ -25,8 +25,7 @@ class BookingType extends AbstractType
             ->add('endDate', DateTimeType::class, array(
                 'widget' => 'choice',
                 'years' => range(date('Y'), date('Y') . 5),
-            ))
-        ;
+            ));
     }
 
     public function configureOptions(OptionsResolver $resolver): void
