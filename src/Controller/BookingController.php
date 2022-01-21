@@ -61,7 +61,7 @@ class BookingController extends AbstractController
 
         return $this->renderForm('booking/index.html.twig', [
             'form' => $form,
-            'errorMessage' => $errorMessage
+            'errorMessage' => $errorMessage,
         ]);
     }
 
@@ -97,6 +97,9 @@ class BookingController extends AbstractController
         $secondsBooked = ($endTime)->getTimestamp() - ($startTime)->getTimestamp();
         $hoursBooked = $secondsBooked % 3600 ? intdiv($secondsBooked, 3600) + 1 : intdiv($secondsBooked, 3600);
         $canPay = $user->canPay($hoursBooked);
+        //user pays for booking
+        $pricePerHour = 2;
+        $user->pay($hoursBooked * $pricePerHour);
 
         // Book a room
         if ($canBook && $canBookTime && $isFree && $canPay) {

@@ -90,6 +90,12 @@ class User
         return $this;
     }
 
+    public function pay(int $amount): void
+    {
+        $newCredit = $this->getCredit() - $amount;
+        $this->setCredit($newCredit);
+    }
+
     /**
      * @return Collection|Booking[]
      */
