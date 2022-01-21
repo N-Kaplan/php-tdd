@@ -14,7 +14,8 @@ class Bookings
     #[ORM\Column(type: 'integer')]
     private $id;
 
-    #[ORM\ManyToOne(targetEntity: Room::class, cascade: ["persist"], inversedBy: 'bookings')]
+    // add  cascade: ["persist"] in order to persist without explicityly calling entityManager->persist($room) in controller
+    #[ORM\ManyToOne(targetEntity: Room::class, inversedBy: 'bookings')]
     #[ORM\JoinColumn(nullable: false)]
     private $roomId;
 

@@ -112,14 +112,13 @@ class Room
     //get reservations from database
     public function getReservations(ManagerRegistry $doctrine): array
     {
-        $room = $doctrine->getManager()->getRepository(Room::class)->find($this->getId());
+        $room = $doctrine->getManager()->find(Room::class, $this->getId());
         $bookings = $room->getBookings();
         $reservations = [];
-        foreach ($bookings as &$value) {
+        foreach ($bookings as $value) {
             $reservations[] = ['startTime' => $value->getStartDate(), 'endTime' => $value->getEndDate()];
         }
-        //array within array?
-        return $reservations[0];
+        return $reservations;
     }
 
     public function isFree(DateTime $start, DateTime $end, array $reservations): bool

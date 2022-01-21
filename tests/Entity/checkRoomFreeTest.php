@@ -2,7 +2,6 @@
 
 use PHPUnit\Framework\TestCase;
 use App\Entity\Room;
-use App\Entity\Bookings;
 
 class checkRoomFreeTest extends TestCase
 {

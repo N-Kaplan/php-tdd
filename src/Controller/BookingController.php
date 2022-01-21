@@ -29,11 +29,16 @@ class BookingController extends AbstractController
     }
 
     #[Route('/booking', name: 'booking')]
-    public function index(ManagerRegistry $doctrine, Request $request, SessionInterface $session): Response
+    public function index(ManagerRegistry $doctrine, Request $request): Response
     {
         $users = $doctrine->getRepository(User::class)->findAll();
         $roomId = $request->query->get('id');
         $room = $doctrine->getRepository(Room::class)->find($roomId);
+        $session = $this->requestStack->getSession();
+
+        //error
+        $errorMessage = $session->get('errorMessage') ?: "";
+
         $form = $this->createForm(BookingType::class)
             ->add('roomId', EntityType::class, ['data' => $room, 'class' => Room::class])
             ->add('userId', EntityType::class, [
@@ -56,13 +61,18 @@ class BookingController extends AbstractController
 
         return $this->renderForm('booking/index.html.twig', [
             'form' => $form,
+            'errorMessage' => $errorMessage
         ]);
     }
 
     #[Route('/success', name: 'success')]
-    public function success(ManagerRegistry $doctrine, RequestStack $requestStack): Response
+    public function success(ManagerRegistry $doctrine): Response
     {
         $session = $this->requestStack->getSession();
+
+        //error
+        $errorMessage = "";
+        $session->set('errorMessage', $errorMessage);
 
         //properties
         $userId = $session->get('userId')->getId();
@@ -78,8 +88,7 @@ class BookingController extends AbstractController
 
         //a room can only be booked when free
         $reservations = $room->getReservations($doctrine);
-        //TODO: figure out where DateTime is confused with array
-      //  $isFree = $room->isFree($startTime, $endTime, $reservations);
+        $isFree = $room->isFree($startTime, $endTime, $reservations);
 
         //rooms can be booked up to 4 hours
         $canBookTime = $room->canBookTime($startTime, $endTime);
@@ -90,7 +99,7 @@ class BookingController extends AbstractController
         $canPay = $user->canPay($hoursBooked);
 
         // Book a room
-        if ($canBook && $canBookTime && $canPay) {
+        if ($canBook && $canBookTime && $isFree && $canPay) {
             $booking = new Bookings();
             $booking->setUserId($user);
             $booking->setRoomId($room);
@@ -99,7 +108,7 @@ class BookingController extends AbstractController
 
 //          see https://symfony.com/doc/current/doctrine.html#relationships-and-associations
             $entityManager = $doctrine->getManager();
-            // tell Doctrine you want to (eventually) save the booking, user (no queries yet)
+            // tell Doctrine you want to (eventually) save the booking, user, room (no queries yet)
             $entityManager->persist($booking);
             $entityManager->persist($user);
             $entityManager->persist($room);
@@ -114,9 +123,19 @@ class BookingController extends AbstractController
                 'endTime' => $session->get('endTime'),
                 'roomName' => $session->get('roomId')->getName(),
             ]);
+        } elseif (!$canBook) {
+            $errorMessage = "You do not have access to premium rooms, please select a regular room.";
+        } elseif (!$canPay) {
+            $errorMessage = "You do not have enough credit for this booking.";
+        } elseif (!$canBookTime) {
+            $errorMessage = "A room can be booked for up to 4 hours. Please select your booking time accordingly";
+        } elseif (!$isFree) {
+            $errorMessage = "The room you selected is booked in this timeframe, please select another room or a different time.";
         }
+
         //if booking is invalid
-        //todo: add error messages!
+        $session->set('errorMessage', $errorMessage);
+
         return $this->redirectToRoute("booking", [
             'id' => $session->get('roomId')->getId()]);
     }
